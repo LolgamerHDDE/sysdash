@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ BOOTSTRAP_CSS_1 }}">
+        <style>
+        .progress-bar-custom {
+            transition: width 0.3s ease;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .system-metric {
+            margin-bottom: 0.5rem;
+        }
+        .network-interface {
+            border-left: 3px solid #007bff;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
     <title>SysDash - A System Dashboard</title>
 </head>
 <body>
@@ -21,7 +38,334 @@
     </header>
   </div>
 
-
+    <div class="container-fluid mt-4">
+        
+        {% if system_info and system_info.get('error') %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> {{ system_info.error }}
+        </div>
+        {% endif %}
+        
+        {% if system_info and not system_info.get('error') %}
+        
+        <!-- CPU Information Section -->
+        {% if system_info.get('cpu_info') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>CPU Information</h2>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-microchip"></i> Platform Information</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if system_info.cpu_info.get('platform_info') %}
+                        <p class="system-metric"><strong>OS:</strong> {{ system_info.cpu_info.platform_info.get('platform', 'Unknown') }}</p>
+                        <p class="system-metric"><strong>Machine:</strong> {{ system_info.cpu_info.platform_info.get('machine', 'Unknown') }}</p>
+                        <p class="system-metric"><strong>Processor:</strong> {{ system_info.cpu_info.platform_info.get('processor', 'Unknown') }}</p>
+                        <p class="system-metric"><strong>Architecture:</strong> 
+                            {% if system_info.cpu_info.platform_info.get('architecture') %}
+                                {{ system_info.cpu_info.platform_info.architecture[0] }}
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tachometer-alt"></i> CPU Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if system_info.cpu_info.get('cpu_stats') %}
+                        <p class="system-metric"><strong>Physical Cores:</strong> {{ system_info.cpu_info.cpu_stats.get('physical_cores', 'Unknown') }}</p>
+                        <p class="system-metric"><strong>Logical CPUs:</strong> {{ system_info.cpu_info.cpu_stats.get('logical_cpus', 'Unknown') }}</p>
+                        {% if system_info.cpu_info.cpu_stats.get('cpu_freq') %}
+                        <p class="system-metric"><strong>Current Frequency:</strong> {{ "%.2f"|format(system_info.cpu_info.cpu_stats.cpu_freq.current) }} MHz</p>
+                        <p class="system-metric"><strong>Max Frequency:</strong> {{ "%.2f"|format(system_info.cpu_info.cpu_stats.cpu_freq.max) }} MHz</p>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CPU Usage Per Core -->
+        {% if system_info.cpu_info.get('cpu_stats') and system_info.cpu_info.cpu_stats.get('cpu_percent_per_core') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> CPU Usage Per Core</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for usage in system_info.cpu_info.cpu_stats.cpu_percent_per_core %}
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <label class="form-label">Core {{ loop.index0 }}</label>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-custom {% if usage > 80 %}bg-danger{% elif usage > 60 %}bg-warning{% else %}bg-success{% endif %}" 
+                                         role="progressbar" style="width: {{ usage }}%" 
+                                         aria-valuenow="{{ usage }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ "%.1f"|format(usage) }}%
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+        
+        <!-- RAM Information Section -->
+        {% if system_info.get('ram_info') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>Memory Information</h2>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-memory"></i> RAM Usage</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="system-metric"><strong>Total RAM:</strong> {{ "%.2f"|format(system_info.ram_info.total_ram / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Available RAM:</strong> {{ "%.2f"|format(system_info.ram_info.available_ram / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Used RAM:</strong> {{ "%.2f"|format(system_info.ram_info.used_ram / (1024**3)) }} GB</p>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">RAM Usage: {{ "%.1f"|format(system_info.ram_info.ram_percent_used) }}%</label>
+                            <div class="progress">
+                                <div class="progress-bar {% if system_info.ram_info.ram_percent_used > 80 %}bg-danger{% elif system_info.ram_info.ram_percent_used > 60 %}bg-warning{% else %}bg-success{% endif %}" 
+                                     role="progressbar" style="width: {{ system_info.ram_info.ram_percent_used }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-hdd"></i> Swap Memory</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if system_info.ram_info.total_swap > 0 %}
+                        <p class="system-metric"><strong>Total Swap:</strong> {{ "%.2f"|format(system_info.ram_info.total_swap / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Used Swap:</strong> {{ "%.2f"|format(system_info.ram_info.used_swap / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Free Swap:</strong> {{ "%.2f"|format(system_info.ram_info.free_swap / (1024**3)) }} GB</p>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Swap Usage: {{ "%.1f"|format(system_info.ram_info.swap_percent_used) }}%</label>
+                            <div class="progress">
+                                <div class="progress-bar {% if system_info.ram_info.swap_percent_used > 80 %}bg-danger{% elif system_info.ram_info.swap_percent_used > 60 %}bg-warning{% else %}bg-info{% endif %}" 
+                                     role="progressbar" style="width: {{ system_info.ram_info.swap_percent_used }}%">
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No swap memory configured</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Disk Information Section -->
+        {% if system_info.get('disk_partitions') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>Disk Information</h2>
+            </div>
+            
+            {% for partition in system_info.disk_partitions %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-hard-drive"></i> {{ partition.device }}</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if partition.get('error') %}
+                        <p class="text-danger">{{ partition.error }}</p>
+                        {% else %}
+                        <p class="system-metric"><strong>Mount Point:</strong> {{ partition.mountpoint }}</p>
+                                                <p class="system-metric"><strong>File System:</strong> {{ partition.fstype }}</p>
+                        <p class="system-metric"><strong>Total Size:</strong> {{ "%.2f"|format(partition.total_size / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Used:</strong> {{ "%.2f"|format(partition.used / (1024**3)) }} GB</p>
+                        <p class="system-metric"><strong>Free:</strong> {{ "%.2f"|format(partition.free / (1024**3)) }} GB</p>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Disk Usage: {{ "%.1f"|format(partition.percent_used) }}%</label>
+                            <div class="progress">
+                                <div class="progress-bar {% if partition.percent_used > 90 %}bg-danger{% elif partition.percent_used > 75 %}bg-warning{% else %}bg-primary{% endif %}" 
+                                     role="progressbar" style="width: {{ partition.percent_used }}%">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Disk I/O Information -->
+        {% if system_info.get('disk_io') and system_info.disk_io %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-exchange-alt"></i> Disk I/O Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p class="system-metric"><strong>Read Count:</strong> {{ "{:,}".format(system_info.disk_io.read_count) }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="system-metric"><strong>Write Count:</strong> {{ "{:,}".format(system_info.disk_io.write_count) }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="system-metric"><strong>Read Bytes:</strong> {{ "%.2f"|format(system_info.disk_io.read_bytes / (1024**3)) }} GB</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="system-metric"><strong>Write Bytes:</strong> {{ "%.2f"|format(system_info.disk_io.write_bytes / (1024**3)) }} GB</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="system-metric"><strong>Read Time:</strong> {{ "{:,}".format(system_info.disk_io.read_time_ms) }} ms</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="system-metric"><strong>Write Time:</strong> {{ "{:,}".format(system_info.disk_io.write_time_ms) }} ms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Network Information Section -->
+        {% if system_info.get('network_info') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>Network Information</h2>
+            </div>
+            
+            {% for interface_name, interface_data in system_info.network_info.items() %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>
+                            <i class="fas fa-network-wired"></i> {{ interface_name }}
+                            {% if interface_data.is_up %}
+                                <span class="badge bg-success ms-2">UP</span>
+                            {% else %}
+                                <span class="badge bg-danger ms-2">DOWN</span>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if interface_data.speed_mbps %}
+                        <p class="system-metric"><strong>Speed:</strong> {{ interface_data.speed_mbps }} Mbps</p>
+                        {% endif %}
+                        {% if interface_data.mtu %}
+                        <p class="system-metric"><strong>MTU:</strong> {{ interface_data.mtu }}</p>
+                        {% endif %}
+                        
+                        {% if interface_data.addresses %}
+                        <h6 class="mt-3">Addresses:</h6>
+                        {% for addr in interface_data.addresses %}
+                        <div class="network-interface">
+                            <small class="text-muted">{{ addr.family }}</small><br>
+                            <strong>{{ addr.address }}</strong>
+                            {% if addr.netmask %}
+                            <br><small>Netmask: {{ addr.netmask }}</small>
+                            {% endif %}
+                            {% if addr.broadcast %}
+                            <br><small>Broadcast: {{ addr.broadcast }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- System Information Summary -->
+        {% if system_info.get('cpu_info') and system_info.cpu_info.get('sys_info') %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> System Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="system-metric"><strong>Python Version:</strong> {{ system_info.cpu_info.sys_info.get('python_version', 'Unknown').split()[0] }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="system-metric"><strong>Python Executable:</strong> 
+                                    <small>{{ system_info.cpu_info.sys_info.get('executable', 'Unknown') }}</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> System information could not be loaded.
+        </div>
+        {% endif %}
+        
+        <!-- Auto-refresh button -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+                <button class="btn btn-secondary ms-2" onclick="toggleDebug()">
+                    <i class="fas fa-bug"></i> Toggle Debug
+                </button>
+            </div>
+        </div>
+        
+        <!-- Debug information (hidden by default) -->
+        <div class="row mb-4" id="debug-section" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bug"></i> Debug Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre style="max-height: 400px; overflow-y: auto; font-size: 0.8rem;">{{ system_info | tojson(indent=2) }}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
   <div class="container">
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
@@ -38,4 +382,20 @@
 </div>
 </body>
 <script src="{{ BOOTSTRAP_JS_1 }}"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script>
+        function toggleDebug() {
+            const debugSection = document.getElementById('debug-section');
+            if (debugSection.style.display === 'none') {
+                debugSection.style.display = 'block';
+            } else {
+                debugSection.style.display = 'none';
+            }
+        }
+        
+        // Auto-refresh every 30 seconds (optional)
+        // setInterval(() => {
+        //     location.reload();
+        // }, 30000);
+    </script>
 </html>
