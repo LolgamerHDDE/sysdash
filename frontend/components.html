@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ BOOTSTRAP_CSS_1 }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
         <style>
         .progress-bar-custom {
             transition: width 0.3s ease;
@@ -21,7 +22,7 @@
             margin-bottom: 1rem;
         }
     </style>
-    <title>SysDash - A System Dashboard</title>
+    <title>SysDash - Component Overview</title>
 </head>
 <body>
     <div class="container">
@@ -38,7 +39,7 @@
     </header>
   </div>
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4 container">
         
         {% if system_info and system_info.get('error') %}
         <div class="alert alert-danger" role="alert">

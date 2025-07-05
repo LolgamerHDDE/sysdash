@@ -4,38 +4,349 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ BOOTSTRAP_CSS_1 }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
     <title>SysDash - A System Dashboard</title>
 </head>
 <body>
     <div class="container">
-    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-        <span class="fs-4">SysDash - A System Dashboard</span>
-      </a>
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">SysDash - A System Dashboard</span>
+            </a>
 
-      <ul class="nav nav-pills">
-        <li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Overview</a></li>
-        <li class="nav-item"><a href="/components" class="nav-link">Components</a></li>
-        <li class="nav-item"><a href="/tests" class="nav-link">Tests</a></li>
-      </ul>
-    </header>
-  </div>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Overview</a></li>
+                <li class="nav-item"><a href="/components" class="nav-link">Components</a></li>
+                <li class="nav-item"><a href="/tests" class="nav-link">Tests</a></li>
+            </ul>
+        </header>
+    </div>
 
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold text-primary">Welcome to SysDash</h1>
+                <p class="lead text-muted">Your comprehensive system monitoring and performance dashboard</p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="/components" class="btn btn-primary btn-lg">View System Info</a>
+                    <a href="/tests" class="btn btn-outline-primary btn-lg">Run Performance Tests</a>
+                </div>
+            </div>
+        </div>
 
+        <!-- Quick Stats Cards -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-center mb-4">System Overview</h2>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="text-primary mb-2">
+                            <svg width="48" height="48" fill="currentColor" class="bi bi-cpu" viewBox="0 0 16 16">
+                                <path d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 13.5 4.5H15a.5.5 0 0 1 0 1h-1.5v1H15a.5.5 0 0 1 0 1h-1.5v1H15a.5.5 0 0 1 0 1h-1.5v1H15a.5.5 0 0 1 0 1h-1.5a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2.5 11.5H1a.5.5 0 0 1 0-1h1.5v-1H1a.5.5 0 0 1 0-1h1.5v-1H1a.5.5 0 0 1 0-1h1.5v-1H1a.5.5 0 0 1 0-1h1.5A2.5 2.5 0 0 1 5 2V.5A.5.5 0 0 1 5 0zm-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3h-7zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">CPU</h5>
+                        <p class="card-text" id="cpu-info">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="text-success mb-2">
+                            <svg width="48" height="48" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16">
+                                <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H13a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8.414a1 1 0 0 0-.707.293l-.353.353a.5.5 0 0 1-.708 0L6.293 3.293A1 1 0 0 0 5.586 3H1zm0 1h4.586l.353.353A1.5 1.5 0 0 0 8.061 4.5a1.5 1.5 0 0 0 2.122-.147L10.536 4H13v8H8.414l-.353-.353a1.5 1.5 0 0 0-2.122 0L5.586 12H1V4z"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Memory</h5>
+                        <p class="card-text" id="ram-info">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="text-warning mb-2">
+                            <svg width="48" height="48" fill="currentColor" class="bi bi-hdd" viewBox="0 0 16 16">
+                                <path d="M4.5 11a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zM3 10.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                                <path d="M16 11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V9.51c0-.418.105-.83.305-1.197l2.472-4.531A1.5 1.5 0 0 1 4.094 3h7.812a1.5 1.5 0 0 1 1.317.782l2.472 4.53c.2.368.305.78.305 1.198V11zM3.655 4.26 1.592 8.043c-.081.146-.123.304-.123.468v2.489c0 .546.445.991.991.991h12.08c.546 0 .991-.445.991-.991V8.51c0-.164-.042-.322-.123-.468L13.345 4.26a.5.5 0 0 0-.439-.26H4.094a.5.5 0 0 0-.44.26z"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Storage</h5>
+                        <p class="card-text" id="disk-info">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="text-info mb-2">
+                            <svg width="48" height="48" fill="currentColor" class="bi bi-wifi" viewBox="0 0 16 16">
+                                <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.444 12.444 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049z"/>
+                                <path d="M13.229 8.271a.482.482 0 0 0-.063-.745A9.455 9.455 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.576 1.336c.206.132.48.108.653-.065zm-2.183 2.183c.226-.226.185-.605-.1-.75A6.473 6.473 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.407.19.611.09A5.478 5.478 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.61-.091l.016-.015zM9.06 12.44c.196-.196.198-.52-.04-.66A1.99 1.99 0 0 0 8 11.5a1.99 1.99 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .708 0l.707-.707z"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Network</h5>
+                        <p class="card-text" id="network-info">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <div class="container">
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <p class="col-md-4 mb-0 text-body-secondary">© 2025 LolgamerHD</p>
-        <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" aria-label="Bootstrap">
-            <svg class="bi me-2" width="40" height="32" aria-hidden="true"><use xlink:href="#bootstrap"></use></svg>
-        </a>
-        <ul class="nav col-md-4 justify-content-end">
+        <!-- Features Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-center mb-4">Features</h2>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-primary mb-3">
+                            <svg width="64" height="64" fill="currentColor" class="bi bi-speedometer2" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+                                <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+                            </svg>
+                        </div>
+                        <h4>System Monitoring</h4>
+                        <p class="card-text">Real-time monitoring of CPU, RAM, disk usage, and network statistics. Get detailed insights into your system's performance.</p>
+                        <a href="/components" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                              <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-3">
+                            <svg width="64" height="64" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07Z"/>
+                            </svg>
+                        </div>
+                        <h4>Performance Benchmarks</h4>
+                        <p class="card-text">Comprehensive benchmarking suite for CPU, RAM, disk I/O, and GPU performance testing with detailed results.</p>
+                        <a href="/tests" class="btn btn-outline-success">Run Benchmarks</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-warning mb-3">
+                            <svg width="64" height="64" fill="currentColor" class="bi bi-speedometer" viewBox="0 0 16 16">
+                                <path d="M8 2a.5.5 0 0 1 .5.5V4a.5.5 0 0 1-1 0V2.5A.5.5 0 0 1 8 2zM3.732 3.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 8a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 7.31A.91.91 0 1 0 8.85 8.569l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+                                <path fill-rule="evenodd" d="M6.664 15.889A8 8 0 1 1 9.336.11a8 8 0 0 1-2.672 15.78zm-4.665-4.283A11.945 11.945 0 0 1 8 10c2.186 0 4.236.585 6.001 1.606a7 7 0 1 0-12.002 0z"/>
+                            </svg>
+                        </div>
+                        <h4>Network Speed Test</h4>
+                        <p class="card-text">Test your internet connection speed with ping, download, and upload measurements using our dedicated test server.</p>
+                        <a href="/tests" class="btn btn-outline-warning">Test Speed</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">System Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Backend Services</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <span class="badge bg-success me-2" id="sysinfo-status">●</span>
+                                        System Information: <span id="sysinfo-text">Available</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span class="badge bg-warning me-2" id="speedtest-status">●</span>
+                                        Speed Test: <span id="speedtest-text">Checking...</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span class="badge bg-info me-2" id="benchmark-status">●</span>
+                                        Benchmarks: <span id="benchmark-text">Checking...</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Quick Actions</h5>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" onclick="refreshSystemInfo()">
+                                        <svg width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise me-2" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                        </svg>
+                                        Refresh System Info
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="window.location.href='/tests'">
+                                        <svg width="16" height="16" fill="currentColor" class="bi bi-play-circle me-2" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="M6.271 5.055a.5.5 0 0 1 .52.038L11 7.055a.5.5 0 0 1 0 .89L6.791 9.907a.5.5 0 0 1-.791-.389V5.482a.5.5 0 0 1 .271-.427z"/>
+                                        </svg>
+                                        Run Performance Tests
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3>About SysDash</h3>
+                        <p class="lead">
+                            SysDash is a comprehensive system monitoring and performance testing dashboard built with FastAPI and Bootstrap. 
+                            It provides real-time system information, performance benchmarks, and network speed testing capabilities.
+                        </p>
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <h5>🖥️ System Monitoring</h5>
+                                <p>Monitor CPU usage, memory consumption, disk space, and network activity in real-time.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5>⚡ Performance Testing</h5>
+                                <p>Benchmark your system's CPU, RAM, disk I/O, and GPU performance with detailed metrics.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5>🌐 Network Testing</h5>
+                                <p>Test your internet connection speed with comprehensive ping, download, and upload tests.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-body-secondary">© 2025 LolgamerHD</p>
+            <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" aria-label="Bootstrap">
+                <svg class="bi me-2" width="40" height="32" aria-hidden="true"><use xlink:href="#bootstrap"></use></svg>
+            </a>
+            <ul class="nav col-md-4 justify-content-end">
                 <li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary">Overview</a></li>
                 <li class="nav-item"><a href="/components" class="nav-link px-2 text-body-secondary">Components</a></li>
                 <li class="nav-item"><a href="/tests" class="nav-link px-2 text-body-secondary">Tests</a></li>
-        </ul>
-     </footer>
-</div>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="{{ BOOTSTRAP_JS_1 }}"></script>
+    <script>
+        // Load system information on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemOverview();
+            checkServiceStatus();
+        });
+
+        async function loadSystemOverview() {
+            try {
+                const response = await fetch('/api/components');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update CPU info
+                    const cpuInfo = data.cpu_info?.cpu_info;
+                    if (cpuInfo) {
+                        document.getElementById('cpu-info').textContent = 
+                            `${cpuInfo.brand_raw || 'Unknown CPU'} (${cpuInfo.count || 'N/A'} cores)`;
+                    }
+                    
+                    // Update RAM info
+                    const ramInfo = data.ram_info;
+                    if (ramInfo) {
+                        const totalGB = Math.round(ramInfo.total / (1024**3));
+                        const usedGB = Math.round(ramInfo.used / (1024**3));
+                        const usagePercent = Math.round(ramInfo.percent);
+                        document.getElementById('ram-info').textContent = 
+                            `${usedGB}GB / ${totalGB}GB (${usagePercent}%)`;
+                    }
+                    
+                    // Update Disk info
+                    const diskPartitions = data.disk_partitions;
+                    if (diskPartitions && diskPartitions.length > 0) {
+                        const mainDisk = diskPartitions[0];
+                        const totalGB = Math.round(mainDisk.total / (1024**3));
+                        const usedGB = Math.round(mainDisk.used / (1024**3));
+                        const usagePercent = Math.round(mainDisk.percent);
+                        document.getElementById('disk-info').textContent = 
+                            `${usedGB}GB / ${totalGB}GB (${usagePercent}%)`;
+                    }
+                    
+                    // Update Network info
+                    const networkInfo = data.network_info;
+                    if (networkInfo && networkInfo.interfaces) {
+                        const activeInterfaces = Object.keys(networkInfo.interfaces).length;
+                        document.getElementById('network-info').textContent = 
+                            `${activeInterfaces} interface(s) active`;
+                    }
+                } else {
+                    throw new Error('Failed to load system info');
+                }
+            } catch (error) {
+                console.error('Error loading system overview:', error);
+                document.getElementById('cpu-info').textContent = 'Error loading';
+                document.getElementById('ram-info').textContent = 'Error loading';
+                document.getElementById('disk-info').textContent = 'Error loading';
+                document.getElementById('network-info').textContent = 'Error loading';
+            }
+        }
+
+        async function checkServiceStatus() {
+            // Check speedtest availability
+            try {
+                const response = await fetch('/api/speedtest/ping');
+                if (response.ok) {
+                    document.getElementById('speedtest-status').className = 'badge bg-success me-2';
+                    document.getElementById('speedtest-text').textContent = 'Available';
+                } else {
+                    throw new Error('Not available');
+                }
+            } catch (error) {
+                document.getElementById('speedtest-status').className = 'badge bg-danger me-2';
+                document.getElementById('speedtest-text').textContent = 'Not Available';
+            }
+
+            // Check benchmark availability
+            try {
+                const response = await fetch('/api/benchmark/cpu-single');
+                if (response.ok) {
+                    document.getElementById('benchmark-status').className = 'badge bg-success me-2';
+                    document.getElementById('benchmark-text').textContent = 'Available';
+                } else {
+                    throw new Error('Not available');
+                }
+            } catch (error) {
+                document.getElementById('benchmark-status').className = 'badge bg-danger me-2';
+                document.getElementById('benchmark-text').textContent = 'Not Available';
+            }
+        }
+
+        async function refreshSystemInfo() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Refreshing...';
+            button.disabled = true;
+            
+            try {
+                await loadSystemOverview();
+                await checkServiceStatus();
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+    </script>
 </body>
-<script src="{{ BOOTSTRAP_JS_1 }}"></script>
 </html>

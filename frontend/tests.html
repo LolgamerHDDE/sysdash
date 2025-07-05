@@ -4,38 +4,706 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ BOOTSTRAP_CSS_1 }}">
-    <title>SysDash - A System Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <title>SysDash - System Tests</title>
 </head>
 <body>
     <div class="container">
-    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-        <span class="fs-4">SysDash - A System Dashboard</span>
-      </a>
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">SysDash - A System Dashboard</span>
+            </a>
 
-      <ul class="nav nav-pills">
-        <li class="nav-item"><a href="/" class="nav-link">Overview</a></li>
-        <li class="nav-item"><a href="/components" class="nav-link">Components</a></li>
-        <li class="nav-item"><a href="/tests" class="nav-link active" aria-current="page">Tests</a></li>
-      </ul>
-    </header>
-  </div>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="/" class="nav-link">Overview</a></li>
+                <li class="nav-item"><a href="/components" class="nav-link">Components</a></li>
+                <li class="nav-item"><a href="/tests" class="nav-link active" aria-current="page">Tests</a></li>
+            </ul>
+        </header>
+    </div>
 
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="testTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="speedtest-tab" data-bs-toggle="tab" data-bs-target="#speedtest" type="button" role="tab" aria-controls="speedtest" aria-selected="true">
+                    Network Speed Test
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="benchmark-tab" data-bs-toggle="tab" data-bs-target="#benchmark" type="button" role="tab" aria-controls="benchmark" aria-selected="false">
+                    System Benchmark
+                </button>
+            </li>
+        </ul>
 
+        <!-- Tab Content -->
+        <div class="tab-content" id="testTabsContent">
+            <!-- Speedtest Tab -->
+            <div class="tab-pane fade show active" id="speedtest" role="tabpanel" aria-labelledby="speedtest-tab">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h3>Network Speed Test</h3>
+                        <p class="text-muted">Test your internet connection speed using our speedtest server.</p>
+                        
+                        {% if not speedtest_available %}
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Warning:</strong> Speedtest functionality is not available. Please check if the backend module is properly installed.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
 
-  <div class="container">
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <p class="col-md-4 mb-0 text-body-secondary">© 2025 LolgamerHD</p>
-        <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" aria-label="Bootstrap">
-            <svg class="bi me-2" width="40" height="32" aria-hidden="true"><use xlink:href="#bootstrap"></use></svg>
-        </a>
-        <ul class="nav col-md-4 justify-content-end">
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Ping</h5>
+                                <div class="display-4 text-primary" id="ping-result">--</div>
+                                <p class="card-text">ms</p>
+                                <button class="btn btn-outline-primary" onclick="testPing()" id="ping-btn">Test Ping</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Download</h5>
+                                <div class="display-4 text-success" id="download-result">--</div>
+                                <p class="card-text">Mbps</p>
+                                <button class="btn btn-outline-success" onclick="testDownload()" id="download-btn">Test Download</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Upload</h5>
+                                <div class="display-4 text-warning" id="upload-result">--</div>
+                                <p class="card-text">Mbps</p>
+                                <button class="btn btn-outline-warning" onclick="testUpload()" id="upload-btn">Test Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button class="btn btn-primary btn-lg" onclick="runFullSpeedtest()" id="full-speedtest-btn">
+                            <span class="spinner-border spinner-border-sm d-none" id="full-speedtest-spinner" role="status" aria-hidden="true"></span>
+                            Run Full Speed Test
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Speed Test Results History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="speedtest-results-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Ping (ms)</th>
+                                                <th>Download (Mbps)</th>
+                                                <th>Upload (Mbps)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="speedtest-results-tbody">
+                                            <!-- Results will be added here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benchmark Tab -->
+            <div class="tab-pane fade" id="benchmark" role="tabpanel" aria-labelledby="benchmark-tab">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h3>System Performance Benchmark</h3>
+                        <p class="text-muted">Test your system's CPU, RAM, Disk, and GPU performance.</p>
+                        
+                        {% if not benchmark_available %}
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Warning:</strong> Benchmark functionality is not available. Please check if the backend module is properly installed.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">CPU Single-Thread</h5>
+                                <div class="display-6 text-info" id="cpu-single-result">--</div>
+                                <p class="card-text">seconds</p>
+                                <button class="btn btn-outline-info" onclick="testCpuSingle()" id="cpu-single-btn">Test CPU Single</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">CPU Multi-Thread</h5>
+                                <div class="display-6 text-primary" id="cpu-multi-result">--</div>
+                                <p class="card-text">seconds</p>
+                                <button class="btn btn-outline-primary" onclick="testCpuMulti()" id="cpu-multi-btn">Test CPU Multi</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">RAM Speed</h5>
+                                <div class="display-6 text-success" id="ram-result">--</div>
+                                <p class="card-text">MB/s</p>
+                                <button class="btn btn-outline-success" onclick="testRam()" id="ram-btn">Test RAM</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Disk Write</h5>
+                                <div class="display-6 text-warning" id="disk-write-result">--</div>
+                                <p class="card-text">MB/s</p>
+                                <button class="btn btn-outline-warning" onclick="testDisk()" id="disk-btn">Test Disk</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Disk Read</h5>
+                                <div class="display-6 text-secondary" id="disk-read-result">--</div>
+                                <p class="card-text">MB/s</p>
+                                <small class="text-muted">Tested with Disk Write</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">GPU Performance</h5>
+                                <div class="display-6 text-danger" id="gpu-result">--</div>
+                                <p class="card-text">seconds</p>
+                                <button class="btn btn-outline-danger" onclick="testGpu()" id="gpu-btn">Test GPU</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button class="btn btn-primary btn-lg" onclick="runFullBenchmark()" id="full-benchmark-btn">
+                            <span class="spinner-border spinner-border-sm d-none" id="full-benchmark-spinner" role="status" aria-hidden="true"></span>
+                            Run Full Benchmark Suite
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Benchmark Results History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="benchmark-results-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>CPU Single (s)</th>
+                                                <th>CPU Multi (s)</th>
+                                                <th>RAM (MB/s)</th>
+                                                <th>Disk Write (MB/s)</th>
+                                                <th>Disk Read (MB/s)</th>
+                                                <th>GPU (s)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="benchmark-results-tbody">
+                                            <!-- Results will be added here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <p class="col-md-4 mb-0 text-body-secondary">© 2025 LolgamerHD</p>
+            <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" aria-label="Bootstrap">
+                <svg class="bi me-2" width="40" height="32" aria-hidden="true"><use xlink:href="#bootstrap"></use></svg>
+            </a>
+            <ul class="nav col-md-4 justify-content-end">
                 <li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary">Overview</a></li>
                 <li class="nav-item"><a href="/components" class="nav-link px-2 text-body-secondary">Components</a></li>
                 <li class="nav-item"><a href="/tests" class="nav-link px-2 text-body-secondary">Tests</a></li>
-        </ul>
-     </footer>
-</div>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="{{ BOOTSTRAP_JS_1 }}"></script>
+    <script>
+        const speedtestAvailable = {{ 'true' if speedtest_available else 'false' }};
+        const benchmarkAvailable = {{ 'true' if benchmark_available else 'false' }};
+        
+        // Utility functions
+        function showSpinner(buttonId, spinnerId) {
+            const button = document.getElementById(buttonId);
+            const spinner = document.getElementById(spinnerId);
+            if (spinner) {
+                spinner.classList.remove('d-none');
+            }
+            button.disabled = true;
+        }
+        
+        function hideSpinner(buttonId, spinnerId) {
+            const button = document.getElementById(buttonId);
+            const spinner = document.getElementById(spinnerId);
+            if (spinner) {
+                spinner.classList.add('d-none');
+            }
+            button.disabled = false;
+        }
+        
+        function updateResult(elementId, value, suffix = '') {
+            const element = document.getElementById(elementId);
+            if (value === -1 || value === null) {
+                element.textContent = 'Error';
+                element.className = element.className.replace(/text-\w+/, 'text-danger');
+            } else if (typeof value === 'string' && value.includes('not available')) {
+                element.textContent = 'N/A';
+                element.className = element.className.replace(/text-\w+/, 'text-muted');
+            } else {
+                element.textContent = value + suffix;
+            }
+        }
+        
+        function addToSpeedtestHistory(ping, download, upload) {
+            const tbody = document.getElementById('speedtest-results-tbody');
+            const row = tbody.insertRow(0);
+            const now = new Date().toLocaleTimeString();
+                        
+            row.innerHTML = `
+                <td>${now}</td>
+                <td>${ping === -1 ? 'Error' : ping + ' ms'}</td>
+                <td>${download === -1 ? 'Error' : download + ' Mbps'}</td>
+                <td>${upload === -1 ? 'Error' : upload + ' Mbps'}</td>
+            `;
+            
+            // Keep only last 10 results
+            while (tbody.rows.length > 10) {
+                tbody.deleteRow(tbody.rows.length - 1);
+            }
+        }
+        
+        function addToBenchmarkHistory(results) {
+            const tbody = document.getElementById('benchmark-results-tbody');
+            const row = tbody.insertRow(0);
+            const now = new Date().toLocaleTimeString();
+            
+            row.innerHTML = `
+                <td>${now}</td>
+                <td>${results.cpu_single_thread_sec === -1 ? 'Error' : results.cpu_single_thread_sec + 's'}</td>
+                <td>${results.cpu_multi_thread_sec === -1 ? 'Error' : results.cpu_multi_thread_sec + 's'}</td>
+                <td>${results.ram_copy_speed_MBps === -1 ? 'Error' : results.ram_copy_speed_MBps + ' MB/s'}</td>
+                <td>${results.disk_write_MBps === -1 ? 'Error' : results.disk_write_MBps + ' MB/s'}</td>
+                <td>${results.disk_read_MBps === -1 ? 'Error' : results.disk_read_MBps + ' MB/s'}</td>
+                <td>${typeof results.gpu_vector_add_sec === 'string' ? 'N/A' : (results.gpu_vector_add_sec === -1 ? 'Error' : results.gpu_vector_add_sec + 's')}</td>
+            `;
+            
+            // Keep only last 10 results
+            while (tbody.rows.length > 10) {
+                tbody.deleteRow(tbody.rows.length - 1);
+            }
+        }
+        
+        // Speedtest functions
+        async function testPing() {
+            if (!speedtestAvailable) {
+                alert('Speedtest functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('ping-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/speedtest/ping');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('ping-result', data.ping_ms);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('Ping test failed:', error);
+                updateResult('ping-result', -1);
+                alert('Ping test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testDownload() {
+            if (!speedtestAvailable) {
+                alert('Speedtest functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('download-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/speedtest/download');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('download-result', data.download_speed_mbps);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('Download test failed:', error);
+                updateResult('download-result', -1);
+                alert('Download test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testUpload() {
+            if (!speedtestAvailable) {
+                alert('Speedtest functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('upload-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/speedtest/upload');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('upload-result', data.upload_speed_mbps);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('Upload test failed:', error);
+                updateResult('upload-result', -1);
+                alert('Upload test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function runFullSpeedtest() {
+            if (!speedtestAvailable) {
+                alert('Speedtest functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('full-speedtest-btn');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running Full Speed Test...';
+            button.disabled = true;
+            
+            // Disable individual test buttons
+            document.getElementById('ping-btn').disabled = true;
+            document.getElementById('download-btn').disabled = true;
+            document.getElementById('upload-btn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/speedtest');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update individual results
+                    updateResult('ping-result', data.ping_ms);
+                    updateResult('download-result', data.download_speed_mbps);
+                    updateResult('upload-result', data.upload_speed_mbps);
+                    
+                    // Add to history
+                    addToSpeedtestHistory(data.ping_ms, data.download_speed_mbps, data.upload_speed_mbps);
+                } else {
+                    throw new Error(data.detail || 'Full speedtest failed');
+                }
+            } catch (error) {
+                console.error('Full speedtest failed:', error);
+                alert('Full speedtest failed: ' + error.message);
+                
+                // Show error in all results
+                updateResult('ping-result', -1);
+                updateResult('download-result', -1);
+                updateResult('upload-result', -1);
+            } finally {
+                button.innerHTML = originalText;
+                
+                // Re-enable individual test buttons
+                document.getElementById('ping-btn').disabled = false;
+                document.getElementById('download-btn').disabled = false;
+                document.getElementById('upload-btn').disabled = false;
+            }
+        }
+        
+        // Benchmark functions
+        async function testCpuSingle() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('cpu-single-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/benchmark/cpu-single');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('cpu-single-result', data.cpu_single_thread_sec);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('CPU single test failed:', error);
+                updateResult('cpu-single-result', -1);
+                alert('CPU single test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testCpuMulti() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('cpu-multi-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/benchmark/cpu-multi');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('cpu-multi-result', data.cpu_multi_thread_sec);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('CPU multi test failed:', error);
+                updateResult('cpu-multi-result', -1);
+                alert('CPU multi test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testRam() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('ram-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/benchmark/ram');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('ram-result', data.ram_copy_speed_MBps);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('RAM test failed:', error);
+                updateResult('ram-result', -1);
+                alert('RAM test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testDisk() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('disk-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/benchmark/disk');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('disk-write-result', data.disk_write_MBps);
+                    updateResult('disk-read-result', data.disk_read_MBps);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('Disk test failed:', error);
+                updateResult('disk-write-result', -1);
+                updateResult('disk-read-result', -1);
+                alert('Disk test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function testGpu() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('gpu-btn');
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/benchmark/gpu');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateResult('gpu-result', data.gpu_vector_add_sec);
+                } else {
+                    throw new Error(data.detail || 'Test failed');
+                }
+            } catch (error) {
+                console.error('GPU test failed:', error);
+                updateResult('gpu-result', -1);
+                alert('GPU test failed: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function runFullBenchmark() {
+            if (!benchmarkAvailable) {
+                alert('Benchmark functionality is not available');
+                return;
+            }
+            
+            const button = document.getElementById('full-benchmark-btn');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running Full Benchmark...';
+            button.disabled = true;
+            
+            // Disable individual test buttons
+            const benchmarkButtons = ['cpu-single-btn', 'cpu-multi-btn', 'ram-btn', 'disk-btn', 'gpu-btn'];
+            benchmarkButtons.forEach(btnId => {
+                document.getElementById(btnId).disabled = true;
+            });
+            
+            try {
+                const response = await fetch('/api/benchmark');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update individual results
+                    updateResult('cpu-single-result', data.cpu_single_thread_sec);
+                    updateResult('cpu-multi-result', data.cpu_multi_thread_sec);
+                    updateResult('ram-result', data.ram_copy_speed_MBps);
+                    updateResult('disk-write-result', data.disk_write_MBps);
+                    updateResult('disk-read-result', data.disk_read_MBps);
+                    updateResult('gpu-result', data.gpu_vector_add_sec);
+                    
+                    // Add to history
+                    addToBenchmarkHistory(data);
+                } else {
+                    throw new Error(data.detail || 'Full benchmark failed');
+                }
+            } catch (error) {
+                console.error('Full benchmark failed:', error);
+                alert('Full benchmark failed: ' + error.message);
+                
+                // Show error in all results
+                updateResult('cpu-single-result', -1);
+                updateResult('cpu-multi-result', -1);
+                updateResult('ram-result', -1);
+                updateResult('disk-write-result', -1);
+                updateResult('disk-read-result', -1);
+                updateResult('gpu-result', -1);
+            } finally {
+                button.innerHTML = originalText;
+                
+                // Re-enable individual test buttons
+                benchmarkButtons.forEach(btnId => {
+                    document.getElementById(btnId).disabled = false;
+                });
+            }
+        }
+        
+        // Disable buttons if functionality is not available
+        if (!speedtestAvailable) {
+            document.getElementById('ping-btn').disabled = true;
+            document.getElementById('download-btn').disabled = true;
+            document.getElementById('upload-btn').disabled = true;
+            document.getElementById('full-speedtest-btn').disabled = true;
+        }
+        
+        if (!benchmarkAvailable) {
+            const benchmarkButtons = ['cpu-single-btn', 'cpu-multi-btn', 'ram-btn', 'disk-btn', 'gpu-btn', 'full-benchmark-btn'];
+            benchmarkButtons.forEach(btnId => {
+                document.getElementById(btnId).disabled = true;
+            });
+        }
+    </script>
 </body>
-<script src="{{ BOOTSTRAP_JS_1 }}"></script>
 </html>

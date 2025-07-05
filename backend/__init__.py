@@ -1,1 +1,3 @@
 from backend.sysinfo import get_all_cpu_info, get_cpu_details, get_cpu_stats, get_disk_io, get_disk_partitions, get_full_system_info, get_lscpu_info, get_network_info, get_platform_info, get_ram_info, get_sys_info, get_sysctl_info, get_wmic_info
+from backend.speedtest import ping_server, get_speedtest_results, test_download_speed, test_upload_speed
+from backend.benchmark import ram_copy_speed, run_full_benchmark, gpu_benchmark, disk_benchmark, cpu_multi_thread, cpu_single_thread

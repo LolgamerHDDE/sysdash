@@ -1,0 +1,83 @@
+/* Custom styles for SysDash */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.display-6 {
+    font-weight: 600;
+}
+
+.text-primary {
+    color: #0d6efd !important;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-info {
+    color: #0dcaf0 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+}
+
+/* Status badges */
+.badge {
+    font-size: 0.8em;
+}
+
+/* Button improvements */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Card body padding adjustments */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Icon spacing */
+.bi {
+    vertical-align: -0.125em;
+}
